@@ -91,7 +91,7 @@ module.exports = class Server {
       }))
       .get('/api/wireguard/client/:clientId', Util.promisify(async req => {
         const { clientId } = req.params;
-        return WireGuard.getClient(clientId);
+        return WireGuard.getClient({clientId});
         }))
       .get('/api/wireguard/client/:clientId/qrcode.svg', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
