@@ -232,16 +232,18 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     // Calculate next IP
     let address;
-    for (let i = 0; i < 255; i++)
-      for (let j = 0; j < 255; j++)
+    for (let i = 0; i < 255; i++) {
+      for (let j = 0; j < 255; j++) {
         for (let k = 2; k < 255; k++) {
-      const client = Object.values(config.clients).find(client => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
-      });
+          const client = Object.values(config.clients).find(client => {
+            return client.address === WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
+          });
 
-      if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
-        break;
+          if (!client) {
+            address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
+            break;
+          }
+        }
       }
     }
 
