@@ -13,19 +13,19 @@ server {
     server_name $1;
 
     # HTTP to HTTPS
-    if ($scheme != "https") {
-        return 301 https://$host$request_uri;
+    if (\$scheme != "https") {
+        return 301 https://\$host\$request_uri;
     }
 
     location / {
         proxy_pass  http://127.0.0.1:8080;
         proxy_redirect                      off;
-        proxy_set_header  Host              $http_host;
-        proxy_set_header  X-Real-IP         $remote_addr;
-        proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_set_header  Host              \$http_host;
+        proxy_set_header  X-Real-IP         \$remote_addr;
+        proxy_set_header  X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto \$scheme;
         proxy_read_timeout                  900;
     }
 }
 EOL
-certbot --nginx -d $1
+certbot --nginx --agree-tos -m secureconnections.help@gmail.com -n -d $1
