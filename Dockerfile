@@ -44,6 +44,7 @@ EXPOSE 51821/tcp
 
 # Set Environment
 ENV DEBUG=Server,WireGuard
+ENV NODE_ENV=production
 
 # Run Web UI
 WORKDIR /app
