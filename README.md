@@ -1,3 +1,4 @@
+curl -sSL https://raw.githubusercontent.com/UltimateConnectivity/wg-easy/master/setup.sh | bash -s -- sg.callhabibi.ml
 # WireGuard Easy
 
 [![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
