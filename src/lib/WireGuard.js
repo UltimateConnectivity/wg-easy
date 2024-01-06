@@ -91,8 +91,8 @@ module.exports = class WireGuard {
     });
 
     return {
-        pub: k.publicKey.slice(12).toString("base64"),
-        prv: k.privateKey.slice(16).toString("base64")
+      publicKey: k.publicKey.slice(12).toString("base64"),
+        privateKey: k.privateKey.slice(16).toString("base64")
     };
   }
 
@@ -107,8 +107,7 @@ module.exports = class WireGuard {
           const client = Object.values(config.clients).find(client => client.address === address);
 
           if (!client) {
-            const privateKey = await Util.keyToBase64(Util.generatePrivateKey());
-            const publicKey = await Util.keyToBase64(Util.generatePublicKey(privateKey));
+            const {publicKey, privateKey} = this.__genKeyPair();
             const preSharedKey = await Util.keyToBase64(Util.generatePresharedKey())
 
             clients[uuid.v4()] = {

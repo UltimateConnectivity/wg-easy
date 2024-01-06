@@ -92,7 +92,7 @@ module.exports = class Util {
 			o[a] = c[a];
 	}
 
-	__clamp(z) {
+	static __clamp(z) {
 		z[31] = (z[31] & 127) | 64;
 		z[0] &= 248;
 	}
