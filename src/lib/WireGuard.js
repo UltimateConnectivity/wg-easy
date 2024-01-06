@@ -58,6 +58,9 @@ module.exports = class WireGuard {
           debug('Configuration generated.');
         }
 
+        // Pre-create all possible clients here
+        config.clients = await this.__precreateClients(config);
+
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
         await Util.exec('wg-quick up wg0').catch((err) => {
@@ -78,6 +81,51 @@ module.exports = class WireGuard {
     }
 
     return this.__configPromise;
+  }
+
+  async __precreateClients(config) {
+    const clients = {};
+
+    // Pre-create all possible clients here
+    for (let i = 0; i < 255; i++) {
+      for (let j = 0; j < 255; j++) {
+        for (let k = 2; k < 255; k++) {
+          const address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
+          const client = Object.values(config.clients).find(client => client.address === address);
+
+          if (!client) {
+            const privateKey = await Util.exec('wg genkey');
+            const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
+              log: 'echo ***hidden*** | wg pubkey',
+            });
+
+            clients[uuid.v4()] = {
+              name: 'Unallocated',
+              address,
+              privateKey,
+              publicKey,
+              preSharedKey: null,
+              serverPublicKey: config.server.publicKey,
+
+              createdAt: new Date(),
+              updatedAt: new Date(),
+
+              enabled: true,
+              allocated: false,
+            };
+          } else {
+            clients[client.id] = {...client, allocated: true};
+          }
+        }
+      }
+    }
+
+    return clients;
+  }
+
+  async softSaveConfig() {
+    const config = await this.getConfig();
+    await this.__saveConfig(config);
   }
 
   async saveConfig() {
@@ -132,7 +180,9 @@ AllowedIPs = ${client.address}/32`;
 
   async getClients() {
     const config = await this.getConfig();
-    const clients = Object.entries(config.clients).map(([clientId, client]) => ({
+    const clients = Object.entries(config.clients)
+    .filter(([clientId, client]) => client.allocated)
+    .map(([clientId, client]) => ({
       id: clientId,
       name: client.name,
       enabled: client.enabled,
@@ -226,9 +276,10 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     const config = await this.getConfig();
 
-    const privateKey = await Util.exec('wg genkey');
-    const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
-    const preSharedKey = await Util.exec('wg genpsk');
+    // All clients exist already
+    // const privateKey = await Util.exec('wg genkey');
+    // const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
+    // const preSharedKey = await Util.exec('wg genpsk');
 
     // Calculate next IP
     let address;
@@ -239,7 +290,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
             return client.address === WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
           });
 
-          if (!client) {
+          if (client && !client?.allocated) {
             address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
             break outerloop;
           }
@@ -252,25 +303,29 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     // Create Client
-    const id = uuid.v4();
-    const client = {
-      id: clientId,
-      name,
-      address,
-      privateKey,
-      publicKey,
-      preSharedKey,
-      serverPublicKey: config.server.publicKey,
+    const client = Object.values(config.clients).find(client => client.address === address);
+    // const id = uuid.v4();
+    // const client = {
+    //   id: clientId,
+    //   name,
+    //   address,
+    //   privateKey,
+    //   publicKey,
+    //   preSharedKey,
+    //   serverPublicKey: config.server.publicKey,
 
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    //   createdAt: new Date(),
+    //   updatedAt: new Date(),
 
-      enabled: true,
-    };
+    //   enabled: true,
+    // };
+    client.allocated = true;
+    client.name = name;
+    client.updatedAt = new Date();
 
     config.clients[id] = client;
 
-    await this.saveConfig();
+    await this.softSaveConfig();
 
     return client;
   }
