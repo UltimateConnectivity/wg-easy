@@ -5,7 +5,7 @@ const crypto = require('crypto');
 
 module.exports = class Util {
 
-  static __gf(init) {
+  __gf(init) {
 		var r = new Float64Array(16);
 		if (init) {
 			for (var i = 0; i < init.length; ++i)
@@ -14,7 +14,7 @@ module.exports = class Util {
 		return r;
 	}
 
-	static __pack(o, n) {
+	__pack(o, n) {
 		var b, m = gf(), t = gf();
 		for (var i = 0; i < 16; ++i)
 			t[i] = n[i];
@@ -38,7 +38,7 @@ module.exports = class Util {
 		}
 	}
 
-	static __carry(o) {
+	__carry(o) {
 		var c;
 		for (var i = 0; i < 16; ++i) {
 			o[(i + 1) % 16] += (i < 15 ? 1 : 38) * Math.floor(o[i] / 65536);
@@ -46,7 +46,7 @@ module.exports = class Util {
 		}
 	}
 
-	static __cswap(p, q, b) {
+	__cswap(p, q, b) {
 		var t, c = ~(b - 1);
 		for (var i = 0; i < 16; ++i) {
 			t = c & (p[i] ^ q[i]);
@@ -55,17 +55,17 @@ module.exports = class Util {
 		}
 	}
 
-	static __add(o, a, b) {
+	__add(o, a, b) {
 		for (var i = 0; i < 16; ++i)
 			o[i] = (a[i] + b[i]) | 0;
 	}
 
-	static __subtract(o, a, b) {
+	__subtract(o, a, b) {
 		for (var i = 0; i < 16; ++i)
 			o[i] = (a[i] - b[i]) | 0;
 	}
 
-	static __multmod(o, a, b) {
+	__multmod(o, a, b) {
 		var t = new Float64Array(31);
 		for (var i = 0; i < 16; ++i) {
 			for (var j = 0; j < 16; ++j)
@@ -79,7 +79,7 @@ module.exports = class Util {
 		carry(o);
 	}
 
-	static __invert(o, i) {
+	__invert(o, i) {
 		var c = gf();
 		for (var a = 0; a < 16; ++a)
 			c[a] = i[a];
@@ -92,7 +92,7 @@ module.exports = class Util {
 			o[a] = c[a];
 	}
 
-	static __clamp(z) {
+	__clamp(z) {
 		z[31] = (z[31] & 127) | 64;
 		z[0] &= 248;
 	}
@@ -148,12 +148,13 @@ module.exports = class Util {
 	}
 
 	static generatePrivateKey() {
-		var privateKey = generatePresharedKey();
+		var privateKey = new Uint8Array(32);
+		crypto.getRandomValues(privateKey);
 		__clamp(privateKey);
 		return privateKey;
 	}
 
-	static encodeBase64(dest, src) {
+	encodeBase64(dest, src) {
 		var input = Uint8Array.from([(src[0] >> 2) & 63, ((src[0] << 4) | (src[1] >> 4)) & 63, ((src[1] << 2) | (src[2] >> 6)) & 63, src[2] & 63]);
 		for (var i = 0; i < 4; ++i)
 			dest[i] = input[i] + 65 +
