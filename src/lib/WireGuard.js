@@ -2,6 +2,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const crypto = require("crypto");
 
 const debug = require('debug')('WireGuard');
 const uuid = require('uuid');
@@ -83,6 +84,18 @@ module.exports = class WireGuard {
     return this.__configPromise;
   }
 
+  __genKeyPair() {
+    let k = crypto.generateKeyPairSync("x25519", {
+        publicKeyEncoding: { format: "der", type: "spki" },
+        privateKeyEncoding: { format: "der", type: "pkcs8" }
+    });
+
+    return {
+        pub: k.publicKey.slice(12).toString("base64"),
+        prv: k.privateKey.slice(16).toString("base64")
+    };
+  }
+
   async __precreateClients(config) {
     const clients = config.clients;
 
@@ -94,17 +107,16 @@ module.exports = class WireGuard {
           const client = Object.values(config.clients).find(client => client.address === address);
 
           if (!client) {
-            const privateKey = await Util.exec('wg genkey');
-            const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
-              log: 'echo ***hidden*** | wg pubkey',
-            });
+            const privateKey = await Util.keyToBase64(Util.generatePrivateKey());
+            const publicKey = await Util.keyToBase64(Util.generatePublicKey(privateKey));
+            const preSharedKey = await Util.keyToBase64(Util.generatePresharedKey())
 
             clients[uuid.v4()] = {
               name: 'Unallocated',
               address,
               privateKey,
               publicKey,
-              preSharedKey: null,
+              preSharedKey,
               serverPublicKey: config.server.publicKey,
 
               createdAt: new Date(),
