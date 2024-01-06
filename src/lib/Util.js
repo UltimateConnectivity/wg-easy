@@ -18,9 +18,9 @@ module.exports = class Util {
 		var b, m = gf(), t = gf();
 		for (var i = 0; i < 16; ++i)
 			t[i] = n[i];
-		carry(t);
-		carry(t);
-		carry(t);
+		this.__carry(t);
+		this.__carry(t);
+		this.__carry(t);
 		for (var j = 0; j < 2; ++j) {
 			m[0] = t[0] - 0xffed;
 			for (var i = 1; i < 15; ++i) {
@@ -75,8 +75,8 @@ module.exports = class Util {
 			t[i] += 38 * t[i + 16];
 		for (var i = 0; i < 16; ++i)
 			o[i] = t[i];
-		carry(o);
-		carry(o);
+		this.__carry(o);
+		this.__carry(o);
 	}
 
 	__invert(o, i) {
@@ -84,9 +84,9 @@ module.exports = class Util {
 		for (var a = 0; a < 16; ++a)
 			c[a] = i[a];
 		for (var a = 253; a >= 0; --a) {
-			multmod(c, c, c);
+			this.__multmod(c, c, c);
 			if (a !== 2 && a !== 4)
-				multmod(c, c, i);
+				this.__multmod(c, c, i);
 		}
 		for (var a = 0; a < 16; ++a)
 			o[a] = c[a];
@@ -99,45 +99,45 @@ module.exports = class Util {
 
 	static generatePublicKey(privateKey) {
 		var r, z = new Uint8Array(32);
-		var a = __gf([1]),
-			b = __gf([9]),
-			c = __gf(),
-			d = __gf([1]),
-			e = __gf(),
-			f = __gf(),
-			_121665 = __gf([0xdb41, 1]),
-			_9 = __gf([9]);
+		var a = this.__gf([1]),
+			b = this.__gf([9]),
+			c = this.__gf(),
+			d = this.__gf([1]),
+			e = this.__gf(),
+			f = this.__gf(),
+			_121665 = this.__gf([0xdb41, 1]),
+			_9 = this.__gf([9]);
 		for (var i = 0; i < 32; ++i)
 			z[i] = privateKey[i];
-		__clamp(z);
+		this.this.__clamp(z);
 		for (var i = 254; i >= 0; --i) {
 			r = (z[i >>> 3] >>> (i & 7)) & 1;
-			__cswap(a, b, r);
-			__cswap(c, d, r);
-			__add(e, a, c);
-			__subtract(a, a, c);
-			__add(c, b, d);
-			__subtract(b, b, d);
-			__multmod(d, e, e);
-			__multmod(f, a, a);
-			__multmod(a, c, a);
-			__multmod(c, b, e);
-			__add(e, a, c);
-			__subtract(a, a, c);
-			__multmod(b, a, a);
-			__subtract(c, d, f);
-			__multmod(a, c, _121665);
-			__add(a, a, d);
-			__multmod(c, c, a);
-			__multmod(a, d, f);
-			__multmod(d, b, _9);
-			__multmod(b, e, e);
-			__cswap(a, b, r);
-			__cswap(c, d, r);
+			this.__cswap(a, b, r);
+			this.__cswap(c, d, r);
+			this.__add(e, a, c);
+			this.__subtract(a, a, c);
+			this.__add(c, b, d);
+			this.__subtract(b, b, d);
+			this.__multmod(d, e, e);
+			this.__multmod(f, a, a);
+			this.__multmod(a, c, a);
+			this.__multmod(c, b, e);
+			this.__add(e, a, c);
+			this.__subtract(a, a, c);
+			this.__multmod(b, a, a);
+			this.__subtract(c, d, f);
+			this.__multmod(a, c, _121665);
+			this.__add(a, a, d);
+			this.__multmod(c, c, a);
+			this.__multmod(a, d, f);
+			this.__multmod(d, b, _9);
+			this.__multmod(b, e, e);
+			this.__cswap(a, b, r);
+			this.__cswap(c, d, r);
 		}
-		__invert(c, c);
-		__multmod(a, a, c);
-		__pack(z, a);
+		this.__invert(c, c);
+		this.__multmod(a, a, c);
+		this.__pack(z, a);
 		return z;
 	}
 
@@ -150,7 +150,7 @@ module.exports = class Util {
 	static generatePrivateKey() {
 		var privateKey = new Uint8Array(32);
 		crypto.getRandomValues(privateKey);
-		__clamp(privateKey);
+		this.__clamp(privateKey);
 		return privateKey;
 	}
 
@@ -167,8 +167,8 @@ module.exports = class Util {
 	static keyToBase64(key) {
 		var i, base64 = new Uint8Array(44);
 		for (i = 0; i < 32 / 3; ++i)
-			encodeBase64(base64.subarray(i * 4), key.subarray(i * 3));
-		encodeBase64(base64.subarray(i * 4), Uint8Array.from([key[i * 3 + 0], key[i * 3 + 1], 0]));
+			this.encodeBase64(base64.subarray(i * 4), key.subarray(i * 3));
+		this.encodeBase64(base64.subarray(i * 4), Uint8Array.from([key[i * 3 + 0], key[i * 3 + 1], 0]));
 		base64[43] = 61;
 		return String.fromCharCode.apply(null, base64);
 	}
