@@ -84,7 +84,7 @@ module.exports = class WireGuard {
   }
 
   async __precreateClients(config) {
-    const clients = {};
+    const clients = config.clients;
 
     // Pre-create all possible clients here
     for (let i = 0; i < 255; i++) {
