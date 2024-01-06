@@ -165,10 +165,20 @@ module.exports = class Util {
 	}
 
 	static keyToBase64(key) {
+    function encodeBase64(dest, src) {
+      var input = Uint8Array.from([(src[0] >> 2) & 63, ((src[0] << 4) | (src[1] >> 4)) & 63, ((src[1] << 2) | (src[2] >> 6)) & 63, src[2] & 63]);
+      for (var i = 0; i < 4; ++i)
+        dest[i] = input[i] + 65 +
+        (((25 - input[i]) >> 8) & 6) -
+        (((51 - input[i]) >> 8) & 75) -
+        (((61 - input[i]) >> 8) & 15) +
+        (((62 - input[i]) >> 8) & 3);
+    }
+
 		var i, base64 = new Uint8Array(44);
 		for (i = 0; i < 32 / 3; ++i)
-			this.encodeBase64(base64.subarray(i * 4), key.subarray(i * 3));
-		this.encodeBase64(base64.subarray(i * 4), Uint8Array.from([key[i * 3 + 0], key[i * 3 + 1], 0]));
+			encodeBase64(base64.subarray(i * 4), key.subarray(i * 3));
+		encodeBase64(base64.subarray(i * 4), Uint8Array.from([key[i * 3 + 0], key[i * 3 + 1], 0]));
 		base64[43] = 61;
 		return String.fromCharCode.apply(null, base64);
 	}
