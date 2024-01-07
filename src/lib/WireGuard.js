@@ -125,7 +125,7 @@ module.exports = class WireGuard {
               enabled: true,
               allocated: false,
             };
-          } else {
+          } else if(client && client.allocated == undefined){
             clients[client.id] = {...client, allocated: true};
           }
         }
