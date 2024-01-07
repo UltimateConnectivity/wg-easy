@@ -335,7 +335,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     client.name = name;
     client.updatedAt = new Date();
 
-    config.clients[id] = client;
+    config.clients[client.id] = client;
 
     await this.softSaveConfig();
 
