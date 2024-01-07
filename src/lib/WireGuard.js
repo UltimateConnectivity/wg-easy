@@ -100,7 +100,7 @@ module.exports = class WireGuard {
     const clients = config.clients;
 
     // Pre-create all possible clients here
-    for (let i = 0; i < 255; i++) {
+    for (let i = 0; i < 1; i++) {
       for (let j = 0; j < 255; j++) {
         for (let k = 2; k < 255; k++) {
           const address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
@@ -293,28 +293,28 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     // const preSharedKey = await Util.exec('wg genpsk');
 
     // Calculate next IP
-    let address;
-    outerloop: for (let i = 0; i < 255; i++) {
-      for (let j = 0; j < 255; j++) {
-        for (let k = 2; k < 255; k++) {
-          const client = Object.values(config.clients).find(client => {
-            return client.address === WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
-          });
+    // let address;
+    // outerloop: for (let i = 0; i < 1; i++) {
+    //   for (let j = 0; j < 255; j++) {
+    //     for (let k = 2; k < 255; k++) {
+    //       const client = Object.values(config.clients).find(client => {
+    //         return client.address === WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
+    //       });
 
-          if (client && !client?.allocated) {
-            address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
-            break outerloop;
-          }
-        }
-      }
-    }
+    //       if (client && !client?.allocated) {
+    //         address = WG_DEFAULT_ADDRESS.replace('x', i).replace('y', j).replace('z', k);
+    //         break outerloop;
+    //       }
+    //     }
+    //   }
+    // }
+    const client = Object.values(config.clients).find(client => client.allocated === false)
 
-    if (!address) {
+    if (!client) {
       throw new Error('Maximum number of clients reached.');
     }
 
     // Create Client
-    const client = Object.values(config.clients).find(client => client.address === address);
     // const id = uuid.v4();
     // const client = {
     //   id: clientId,
