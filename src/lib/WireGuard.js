@@ -59,9 +59,6 @@ module.exports = class WireGuard {
           debug('Configuration generated.');
         }
 
-        // Pre-create all possible clients here
-        config.clients = await this.__precreateClients(config);
-
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
         await Util.exec('wg-quick up wg0').catch((err) => {
@@ -75,7 +72,11 @@ module.exports = class WireGuard {
         // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
-        // await this.__syncConfig();
+
+        // Pre-create all possible clients here
+        config.clients = await this.__precreateClients(config);
+        await this.__saveConfig(config);
+        await this.__syncConfig();
 
         return config;
       });
