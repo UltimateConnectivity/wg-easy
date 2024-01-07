@@ -99,6 +99,9 @@ module.exports = class WireGuard {
   async __precreateClients(config) {
     const clients = config.clients;
 
+    //precheck if last client is allocated
+    if(Object.values(config.clients).find(client => client.address === `10.0.254.254`)) return clients;
+
     // Pre-create all possible clients here
     for (let i = 0; i < 1; i++) {
       for (let j = 0; j < 255; j++) {
