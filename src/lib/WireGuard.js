@@ -113,9 +113,11 @@ module.exports = class WireGuard {
           if (!client) {
             const {publicKey, privateKey} = this.__genKeyPair();
             const preSharedKey = await Util.keyToBase64(Util.generatePresharedKey())
+            const clientId = uuid.v4();
 
-            clients[uuid.v4()] = {
+            clients[clientId] = {
               name: 'Unallocated',
+              id: clientId,
               address,
               privateKey,
               publicKey,
