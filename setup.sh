@@ -1,5 +1,5 @@
 curl -sSL https://get.docker.com | sh
-apt-get install -y certbot nginx git python3-certbot-nginx
+apt-get install -y certbot ufw nginx git python3-certbot-nginx
 git clone https://github.com/UltimateConnectivity/wg-easy.git
 cd wg-easy/
 docker build -t"custom" .
