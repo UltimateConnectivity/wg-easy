@@ -24,7 +24,8 @@ iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x
 iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
 iptables -A FORWARD -i wg0 -j ACCEPT;
 iptables -A FORWARD -o wg0 -j ACCEPT;
+/etc/wireguard/bandwidth-limit.sh
 `.split('\n').join(' ');
 
-module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
+module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || 'tc qdisc del dev wg0 ingress';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
