@@ -23,7 +23,7 @@ COPY --from=build_node_modules /app /app
 RUN mv /app/node_modules /node_modules
 
 # Autolimit bandwidth per peer
-RUN cp /app/bandwidth-limit.sh /etc/wireguard/bandwidth-limit.sh
+COPY src/bandwidth-limit.sh /etc/wireguard/bandwidth-limit.sh
 
 # Install Linux packages
 RUN apk add -U --no-cache \
