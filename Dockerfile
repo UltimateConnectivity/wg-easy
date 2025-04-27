@@ -22,9 +22,6 @@ COPY --from=build_node_modules /app /app
 # than what runs inside of docker.
 RUN mv /app/node_modules /node_modules
 
-# Autolimit bandwidth per peer
-COPY src/bandwidth-limit.sh /etc/wireguard/bandwidth-limit.sh
-
 # Install Linux packages
 RUN apk add -U --no-cache \
     dpkg \
