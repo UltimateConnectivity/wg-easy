@@ -33,4 +33,5 @@ module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || 'tc qdisc del dev wg0 in
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || `
 ip rule del iif wg0 from 10.0.0.0/24 lookup 200;
 ip route del default dev ${module.exports.WG_DEVICE} table 200;
-iptables -t nat -D POSTROUTING -s 10.0.0.0/24 -o ${module.exports.WG_DEVICE} -j MASQUERADE`;
+iptables -t nat -D POSTROUTING -s 10.0.0.0/24 -o ${module.exports.WG_DEVICE} -j MASQUERADE
+`.split('\n').join(' ');
