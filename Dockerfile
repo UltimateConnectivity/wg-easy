@@ -25,10 +25,17 @@ RUN mv /app/node_modules /node_modules
 # Install Linux packages
 RUN apk add -U --no-cache \
     dpkg \
+    curl \
     dumb-init \
     iptables \
     iptables-legacy \
     wireguard-tools
+
+RUN /app/install-wgcf.sh
+RUN wgcf register --accept-tos
+RUN wgcf generate
+RUN mkdir -p /etc/wireguard && \
+    mv wgcf-profile.conf /etc/wireguard/wgcf.conf
 
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
@@ -43,4 +50,4 @@ ENV NODE_ENV=production
 
 # Run Web UI
 WORKDIR /app
-CMD ["/usr/bin/dumb-init", "bun", "run", "server.js"]
+CMD ["/usr/bin/dumb-init", "sh", "-c", "wg-quick up wgcf && exec bun run server.js"]
