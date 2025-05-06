@@ -31,6 +31,7 @@ RUN apk add -U --no-cache \
     iptables-legacy \
     wireguard-tools
 
+RUN chmod +x /app/install-wgcf.sh
 RUN /app/install-wgcf.sh
 RUN wgcf register --accept-tos
 RUN wgcf generate
