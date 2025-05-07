@@ -3,7 +3,7 @@ set -e
 
 WG_IFACE="wg0" # WireGuard interface
 IFACE="ifb0"   # or your interface
-RATE="100mbit"   # total allowed bandwidth
+RATE="500mbit"   # total allowed bandwidth
 FLOWS=65536    # number of simultaneous flows tracked
 LIMIT=1024     # max packets in queue
 TARGET="5ms"
