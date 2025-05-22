@@ -35,7 +35,7 @@ RUN chmod +x /app/install-wgcf.sh
 RUN /app/install-wgcf.sh
 RUN wgcf register --accept-tos
 RUN wgcf generate
-RUN mkdir -p /etc/wireguard
+RUN mkdir -p /etc/wireguard && cp wgcf-profile.conf /app/wgcf-profile.conf
 
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
